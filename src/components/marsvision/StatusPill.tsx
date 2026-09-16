@@ -17,9 +17,9 @@ export function StatusPill({
   children,
   className,
 }: {
-  tone?: Tone;
+  tone?: Tone | undefined;
   children: React.ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <span
