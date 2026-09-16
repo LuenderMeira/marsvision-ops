@@ -1,63 +1,54 @@
 import { LayoutGrid, CalendarDays, Users, Stethoscope, Package, Settings, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
-  { id: "schedule", label: "Schedule", icon: CalendarDays },
-  { id: "patients", label: "Patients", icon: Users },
-  { id: "staff", label: "Staff", icon: Stethoscope },
-  { id: "products", label: "Products", icon: Package },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "dashboard", label: "Visão Geral", icon: LayoutGrid },
+  { id: "schedule", label: "Agenda", icon: CalendarDays },
+  { id: "patients", label: "Pacientes", icon: Users },
+  { id: "staff", label: "Equipe", icon: Stethoscope },
+  { id: "products", label: "Produtos", icon: Package },
+  { id: "settings", label: "Configurações", icon: Settings },
 ] as const;
 
 export function Sidebar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-      <div className="flex items-center gap-3 border-b border-sidebar-border px-5 py-5">
-        <div className="flex size-9 items-center justify-center rounded-sm border border-primary/70 bg-primary/15">
-          <Eye className="size-5 text-primary" strokeWidth={1.8} />
+    <>
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar md:flex">
+        <div className="flex items-center gap-3 px-6 py-7">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <Eye className="size-5" strokeWidth={2} />
+          </div>
+          <div className="leading-tight">
+            <div className="text-base font-bold text-sidebar-foreground">MarsVision</div>
+            <div className="text-xs text-muted-foreground">Gestão oftalmológica</div>
+          </div>
         </div>
-        <div className="leading-tight">
-          <div className="text-sm font-semibold tracking-tight text-sidebar-foreground">MarsVision OS</div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">v4.2 // Sector 4</div>
+        <nav className="flex-1 space-y-1 px-4 py-3" aria-label="Navegação principal">
+          <p className="label-tech px-3 pb-3 pt-1">Gestão da clínica</p>
+          {navItems.map((item) => {
+            const active = value === item.id;
+            return (
+              <Button key={item.id} type="button" variant="ghost" onClick={() => onChange(item.id)} className={cn("h-11 w-full justify-start gap-3 rounded-lg px-3 text-sm shadow-none", active ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground hover:bg-sidebar-accent" : "text-muted-foreground hover:bg-muted hover:text-sidebar-foreground")}>
+                <item.icon className="size-4" strokeWidth={2} />{item.label}
+              </Button>
+            );
+          })}
+        </nav>
+        <div className="border-t border-sidebar-border p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-primary">AS</div>
+            <div className="min-w-0 leading-tight"><div className="truncate text-sm font-medium text-sidebar-foreground">Dra. Silva</div><div className="truncate text-xs text-muted-foreground">Diretora clínica</div></div>
+          </div>
         </div>
-      </div>
-
-      <nav className="flex-1 space-y-1 p-3">
-        <p className="label-tech px-2 pb-2 pt-1">Operations</p>
-        {navItems.map((item) => {
-          const active = value === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onChange(item.id)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-sm border-l-2 px-3 py-2 text-left text-sm transition-colors",
-                active
-                  ? "border-primary bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                  : "border-transparent text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
-              )}
-            >
-              <item.icon className="size-4" strokeWidth={1.8} />
-              {item.label}
-            </button>
-          );
-        })}
+      </aside>
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex h-16 items-center justify-around border-t border-border bg-sidebar px-1 shadow-sm md:hidden" aria-label="Navegação principal">
+        {navItems.map((item) => { const active = value === item.id; return (
+          <Button key={item.id} type="button" variant="ghost" onClick={() => onChange(item.id)} aria-label={item.label} className={cn("h-14 min-w-0 flex-1 flex-col gap-1 rounded-lg px-1 text-[10px] shadow-none", active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-muted-foreground")}>
+            <item.icon className="size-4" strokeWidth={2} /><span className="max-w-full truncate">{item.label}</span>
+          </Button>
+        ); })}
       </nav>
-
-      <div className="border-t border-sidebar-border p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-sm border border-border-strong bg-surface-2 font-mono text-xs text-foreground">
-            AS
-          </div>
-          <div className="min-w-0 leading-tight">
-            <div className="truncate text-sm font-medium text-sidebar-foreground">Dr. Silva</div>
-            <div className="truncate font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-              Chief Medical Officer
-            </div>
-          </div>
-        </div>
-      </div>
-    </aside>
+    </>
   );
 }
