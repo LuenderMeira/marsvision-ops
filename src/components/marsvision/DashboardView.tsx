@@ -17,14 +17,16 @@ function Metric({
   warning?: boolean;
 }) {
   return (
-    <div className="panel p-4">
+    <div className="panel p-5">
       <div className="flex items-start justify-between">
         <p className="label-tech">{label}</p>
-        <Icon className={warning ? "size-4 text-warning" : "size-4 text-primary"} strokeWidth={1.8} />
+        <span className={"flex size-9 items-center justify-center rounded-lg " + (warning ? "bg-warning/10 text-warning" : "bg-primary/10 text-primary")}>
+          <Icon className="size-4" strokeWidth={2} />
+        </span>
       </div>
       <p
         className={
-          "mt-3 font-mono text-3xl font-semibold tracking-tight " + (warning ? "text-warning" : "text-foreground")
+          "mt-3 text-3xl font-bold " + (warning ? "text-warning" : "text-foreground")
         }
       >
         {value}
@@ -37,31 +39,31 @@ function Metric({
 export function DashboardView() {
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-3 rounded-sm border border-warning/60 bg-warning/10 p-4">
+      <div className="flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/10 p-4">
         <AlertTriangle className="mt-0.5 size-5 shrink-0 text-warning" strokeWidth={1.8} />
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-warning">Weather Alert</p>
+          <p className="text-sm font-semibold text-warning">Alerta Meteorológico</p>
           <p className="mt-1 text-sm text-foreground">
-            Class 3 Sandstorm approaching Sector 4. Advise patients of potential travel delays.
+            Tempestade de areia Classe 3 se aproximando do Setor 4. Avise os pacientes sobre possíveis atrasos.
           </p>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric label="Today's Consultations" value="42" sub="+6 vs. previous sol" icon={Activity} />
-        <Metric label="Sandstorm Goggles Sold" value="128" sub="Units this cycle" icon={Eye} />
-        <Metric label="Surface Radiation" value="3.2 mSv" sub="HIGH — shielded transit advised" icon={AlertTriangle} warning />
-        <Metric label="Active Patients" value="+12%" sub="1,284 registered this cycle" icon={TrendingUp} />
+        <Metric label="Consultas Hoje" value="42" sub="6 a mais que no sol anterior" icon={Activity} />
+        <Metric label="Óculos Anti-Areia Vendidos" value="128" sub="Unidades neste ciclo" icon={Eye} />
+        <Metric label="Nível de Radiação" value="3,2 mSv" sub="Alto — transporte protegido recomendado" icon={AlertTriangle} warning />
+        <Metric label="Pacientes Ativos" value="+12%" sub="1.284 cadastrados neste ciclo" icon={TrendingUp} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="panel p-4 lg:col-span-2">
+        <div className="panel p-5 lg:col-span-2">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div>
-              <h3 className="text-sm font-semibold">Consultations vs. Product Sales</h3>
-              <p className="label-tech mt-1">Last 7 sols</p>
+              <h3 className="text-base font-semibold">Consultas vs. Vendas de Produtos</h3>
+              <p className="label-tech mt-1">Últimos 7 sóis</p>
             </div>
-            <StatusPill tone="primary">Live feed</StatusPill>
+            <StatusPill tone="primary">Atualizado agora</StatusPill>
           </div>
           <div className="h-72 pt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -71,25 +73,25 @@ export function DashboardView() {
                   dataKey="cycle"
                   tickLine={false}
                   axisLine={{ stroke: "var(--color-border)" }}
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 11, fontFamily: "var(--font-mono)" }}
+                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 11, fontFamily: "var(--font-sans)" }}
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 11, fontFamily: "var(--font-mono)" }}
+                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 11, fontFamily: "var(--font-sans)" }}
                 />
                 <Tooltip
                   cursor={{ fill: "var(--color-surface-2)" }}
                   contentStyle={{
-                    background: "var(--color-surface-2)",
-                    border: "1px solid var(--color-border-strong)",
-                    borderRadius: 2,
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 8,
                     fontSize: 12,
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em" }} />
-                <Bar dataKey="consultations" name="Consultations" fill="var(--color-chart-1)" />
-                <Bar dataKey="sales" name="Product Sales" fill="var(--color-chart-2)" />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Bar dataKey="consultations" name="Consultas" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="sales" name="Vendas de produtos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -97,15 +99,15 @@ export function DashboardView() {
 
         <div className="panel divide-y divide-border">
           <div className="p-4">
-            <h3 className="text-sm font-semibold">Colony Status</h3>
-            <p className="label-tech mt-1">Sector 4 telemetry</p>
+            <h3 className="text-base font-semibold">Status da Colônia</h3>
+            <p className="label-tech mt-1">Monitoramento do Setor 4</p>
           </div>
           {[
-            { k: "Dome pressure", v: "101.3 kPa", tone: "success" as const },
-            { k: "Airborne dust", v: "874 µg/m³", tone: "warning" as const },
-            { k: "Surface temp", v: "-61 °C", tone: "info" as const },
-            { k: "Supply shuttle", v: "ETA 4h 12m", tone: "neutral" as const },
-            { k: "Low-stock SKUs", v: "3 items", tone: "danger" as const },
+            { k: "Pressão da cúpula", v: "101,3 kPa", tone: "success" as const },
+            { k: "Poeira suspensa", v: "874 µg/m³", tone: "warning" as const },
+            { k: "Temperatura externa", v: "-61 °C", tone: "info" as const },
+            { k: "Transporte de suprimentos", v: "Chegada em 4h 12min", tone: "neutral" as const },
+            { k: "Produtos com estoque baixo", v: "3 itens", tone: "danger" as const },
           ].map((r) => (
             <div key={r.k} className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-muted-foreground">{r.k}</span>
@@ -113,7 +115,7 @@ export function DashboardView() {
             </div>
           ))}
           <div className="flex items-center gap-2 px-4 py-3 text-xs text-muted-foreground">
-            <Package className="size-4" strokeWidth={1.8} /> Inventory sync completed 00:12 ago
+            <Package className="size-4" strokeWidth={1.8} /> Estoque sincronizado há 12 minutos
           </div>
         </div>
       </div>

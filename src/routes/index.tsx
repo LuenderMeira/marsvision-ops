@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Radio, Signal } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sidebar, navItems } from "@/components/marsvision/Sidebar";
+import { CalendarDays } from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Sidebar } from "@/components/marsvision/Sidebar";
 import { DashboardView } from "@/components/marsvision/DashboardView";
 import { ScheduleView } from "@/components/marsvision/ScheduleView";
 import { PatientsView } from "@/components/marsvision/PatientsView";
@@ -10,79 +10,42 @@ import { StaffView } from "@/components/marsvision/StaffView";
 import { ProductsView } from "@/components/marsvision/ProductsView";
 import { SettingsView } from "@/components/marsvision/SettingsView";
 
-const title = "MarsVision OS — Martian Eye Clinic Management";
-const description =
-  "Administrative control center for MarsVision: consultations, colony patient registry, clinical staff and ophthalmic inventory on Mars.";
+const title = "MarsVision | Gestão Oftalmológica em Marte";
+const description = "Gestão de consultas, pacientes, equipe clínica e produtos oftalmológicos da MarsVision em Marte.";
+
+const pageTitles = {
+  dashboard: { title: "Visão Geral", subtitle: "Acompanhe o desempenho da clínica hoje" },
+  schedule: { title: "Agenda", subtitle: "Organize consultas e procedimentos" },
+  patients: { title: "Pacientes", subtitle: "Consulte e gerencie os prontuários" },
+  staff: { title: "Equipe", subtitle: "Acompanhe profissionais e escalas" },
+  products: { title: "Produtos", subtitle: "Gerencie catálogo, preços e estoque" },
+  settings: { title: "Configurações", subtitle: "Personalize a operação da clínica" },
+} as const;
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => ({ meta: [{ title }, { name: "description", content: description }, { property: "og:title", content: title }, { property: "og:description", content: description }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: Index,
 });
 
 function Index() {
   const [view, setView] = useState<string>("dashboard");
-
+  const page = pageTitles[view as keyof typeof pageTitles] ?? pageTitles.dashboard;
   return (
     <div className="min-h-screen bg-background">
       <Sidebar value={view} onChange={setView} />
-
-      <div className="md:pl-60">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface px-5 py-4">
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">MarsVision Operations</h1>
-            <p className="label-tech mt-1">Sol 07 // Cycle 2242 // Facility MV-04</p>
-          </div>
-          <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Signal className="size-3.5 text-success" strokeWidth={2} /> Uplink stable
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Radio className="size-3.5 text-accent" strokeWidth={2} /> Earth delay 14m 22s
-            </span>
-          </div>
+      <div className="pb-20 md:pb-0 md:pl-64">
+        <header className="flex flex-wrap items-center justify-between gap-4 px-5 pb-3 pt-7 sm:px-8 sm:pt-9 lg:px-10">
+          <div><h1 className="text-2xl font-bold text-foreground">{page.title}</h1><p className="mt-1 text-sm text-muted-foreground">{page.subtitle}</p></div>
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-muted-foreground shadow-sm"><CalendarDays className="size-4 text-primary" /><span>16 de setembro de 2026</span></div>
         </header>
-
-        <main className="p-5">
+        <main className="px-5 pb-8 pt-5 sm:px-8 lg:px-10">
           <Tabs value={view} onValueChange={setView}>
-            <TabsList className="mb-5 h-auto w-full justify-start gap-1 rounded-sm border border-border bg-surface p-1">
-              {navItems.map((item) => (
-                <TabsTrigger
-                  key={item.id}
-                  value={item.id}
-                  className="rounded-sm px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  {item.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            <TabsContent value="dashboard">
-              <DashboardView />
-            </TabsContent>
-            <TabsContent value="schedule">
-              <ScheduleView />
-            </TabsContent>
-            <TabsContent value="patients">
-              <PatientsView />
-            </TabsContent>
-            <TabsContent value="staff">
-              <StaffView />
-            </TabsContent>
-            <TabsContent value="products">
-              <ProductsView />
-            </TabsContent>
-            <TabsContent value="settings">
-              <SettingsView />
-            </TabsContent>
+            <TabsContent value="dashboard"><DashboardView /></TabsContent>
+            <TabsContent value="schedule"><ScheduleView /></TabsContent>
+            <TabsContent value="patients"><PatientsView /></TabsContent>
+            <TabsContent value="staff"><StaffView /></TabsContent>
+            <TabsContent value="products"><ProductsView /></TabsContent>
+            <TabsContent value="settings"><SettingsView /></TabsContent>
           </Tabs>
         </main>
       </div>
