@@ -8,11 +8,11 @@ export function ProductsView() {
     <div className="panel">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
         <div>
-          <h3 className="text-sm font-semibold">Inventory — Clinic Store</h3>
-          <p className="label-tech mt-1">Prices in Galactic Credits (GC)</p>
+          <h3 className="text-base font-semibold">Estoque da loja clínica</h3>
+          <p className="label-tech mt-1">Valores em Créditos Galácticos (CG)</p>
         </div>
-        <Button variant="outline" className="h-9 rounded-sm">
-          <Plus className="size-4" strokeWidth={2} /> Add Product
+        <Button className="h-9 rounded-lg">
+          <Plus className="size-4" strokeWidth={2} /> Adicionar produto
         </Button>
       </div>
 
@@ -20,7 +20,7 @@ export function ProductsView() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-surface-2">
-              {["SKU", "Product Name", "Category", "Stock Level", "Price (GC)"].map((h) => (
+              {["SKU", "Produto", "Categoria", "Estoque", "Preço (CG)"].map((h) => (
                 <th key={h} className="label-tech px-4 py-2.5 text-left last:text-right">
                   {h}
                 </th>
@@ -32,19 +32,19 @@ export function ProductsView() {
               const low = p.stock < p.min;
               return (
                 <tr key={p.sku} className="border-b border-border last:border-0 hover:bg-surface-2">
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.sku}</td>
+                  <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{p.sku}</td>
                   <td className="px-4 py-3 font-medium text-foreground">{p.name}</td>
                   <td className="px-4 py-3 text-muted-foreground">{p.category}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <span className={"font-mono text-sm " + (low ? "text-destructive" : "text-foreground")}>
+                      <span className={"text-sm font-medium " + (low ? "text-destructive" : "text-foreground")}>
                         {p.stock}
                       </span>
-                      {low && <StatusPill tone="danger">Low stock</StatusPill>}
+                      {low && <StatusPill tone="danger">Estoque baixo</StatusPill>}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-sm text-accent">
-                    {p.price.toLocaleString("en-US")} GC
+                  <td className="px-4 py-3 text-right text-sm font-semibold text-primary">
+                    {p.price.toLocaleString("pt-BR")} CG
                   </td>
                 </tr>
               );

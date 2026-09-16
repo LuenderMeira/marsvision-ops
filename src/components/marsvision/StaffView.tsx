@@ -6,17 +6,17 @@ export function StaffView() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold">Clinical Team</h3>
-          <p className="label-tech mt-1">6 practitioners // shift 07:00 — 19:00</p>
+          <h3 className="text-base font-semibold">Equipe clínica</h3>
+          <p className="label-tech mt-1">6 profissionais • turno das 07:00 às 19:00</p>
         </div>
-        <StatusPill tone="success">3 available now</StatusPill>
+        <StatusPill tone="success">3 disponíveis agora</StatusPill>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {staff.map((s) => (
           <div key={s.name} className="panel p-4">
             <div className="flex items-start gap-3">
-              <div className="flex size-12 items-center justify-center rounded-sm border border-border-strong bg-surface-2 font-mono text-sm text-foreground">
+              <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
                 {s.initials}
               </div>
               <div className="min-w-0 flex-1">
@@ -25,8 +25,8 @@ export function StaffView() {
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-              <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-                {s.license} // {s.cases} cases
+              <span className="text-xs text-muted-foreground">
+                {s.license} • {s.cases} atendimentos
               </span>
               <StatusPill tone={staffTone[s.status]}>{s.status}</StatusPill>
             </div>
