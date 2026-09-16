@@ -13,14 +13,14 @@ import { SettingsView } from "@/components/marsvision/SettingsView";
 const title = "MarsVision | Gestão Oftalmológica em Marte";
 const description = "Gestão de consultas, pacientes, equipe clínica e produtos oftalmológicos da MarsVision em Marte.";
 
-const pageTitles: Record<string, { title: string; subtitle: string }> = {
+const pageTitles = {
   dashboard: { title: "Visão Geral", subtitle: "Acompanhe o desempenho da clínica hoje" },
   schedule: { title: "Agenda", subtitle: "Organize consultas e procedimentos" },
   patients: { title: "Pacientes", subtitle: "Consulte e gerencie os prontuários" },
   staff: { title: "Equipe", subtitle: "Acompanhe profissionais e escalas" },
   products: { title: "Produtos", subtitle: "Gerencie catálogo, preços e estoque" },
   settings: { title: "Configurações", subtitle: "Personalize a operação da clínica" },
-};
+} as const;
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title }, { name: "description", content: description }, { property: "og:title", content: title }, { property: "og:description", content: description }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [view, setView] = useState<string>("dashboard");
-  const page = pageTitles[view] ?? pageTitles.dashboard;
+  const page = pageTitles[view as keyof typeof pageTitles] ?? pageTitles.dashboard;
   return (
     <div className="min-h-screen bg-background">
       <Sidebar value={view} onChange={setView} />
