@@ -79,7 +79,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <Button
                 type="button"
                 variant="ghost"
-                className="h-12 w-full rounded-lg border border-border bg-white text-foreground shadow-sm hover:bg-secondary"
+                className="h-12 w-full rounded-lg border border-border bg-white text-foreground shadow-sm hover:bg-orange-900/10 hover:text-orange-700"
               >
                 <Fingerprint className="size-5 text-primary" />
                 Autenticação Biométrica
