@@ -9,6 +9,7 @@ import { PatientsView } from "@/components/marsvision/PatientsView";
 import { StaffView } from "@/components/marsvision/StaffView";
 import { ProductsView } from "@/components/marsvision/ProductsView";
 import { SettingsView } from "@/components/marsvision/SettingsView";
+import { BillingView } from "@/components/marsvision/BillingView";
 
 const title = "MarsVision | Gestão Oftalmológica em Marte";
 const description = "Gestão de consultas, pacientes, equipe clínica e produtos oftalmológicos da MarsVision em Marte.";
@@ -19,6 +20,7 @@ const pageTitles = {
   patients: { title: "Pacientes", subtitle: "Consulte e gerencie os prontuários" },
   staff: { title: "Equipe", subtitle: "Acompanhe profissionais e escalas" },
   products: { title: "Produtos", subtitle: "Gerencie catálogo, preços e estoque" },
+  billing: { title: "Faturamento", subtitle: "Acompanhe seu plano e as cobranças da clínica" },
   settings: { title: "Configurações", subtitle: "Personalize a operação da clínica" },
 } as const;
 
@@ -45,6 +47,7 @@ function Index() {
             <TabsContent value="patients"><PatientsView /></TabsContent>
             <TabsContent value="staff"><StaffView /></TabsContent>
             <TabsContent value="products"><ProductsView /></TabsContent>
+            <TabsContent value="billing"><BillingView /></TabsContent>
             <TabsContent value="settings"><SettingsView /></TabsContent>
           </Tabs>
         </main>

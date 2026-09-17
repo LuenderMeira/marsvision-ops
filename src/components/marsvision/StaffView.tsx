@@ -1,5 +1,7 @@
 import { staff } from "./data";
 import { StatusPill, staffTone } from "./StatusPill";
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function StaffView() {
   return (
@@ -23,6 +25,7 @@ export function StaffView() {
                 <p className="truncate text-sm font-semibold text-foreground">{s.name}</p>
                 <p className="truncate text-xs text-muted-foreground">{s.specialty}</p>
               </div>
+              <Button type="button" variant="ghost" size="icon" aria-label={`Editar ${s.name}`} title={`Editar ${s.name}`} className="size-8 shrink-0 text-muted-foreground hover:text-foreground"><Pencil className="size-4" /></Button>
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
               <span className="text-xs text-muted-foreground">
