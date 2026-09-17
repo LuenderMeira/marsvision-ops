@@ -8,12 +8,12 @@ const timeSlots = Array.from(
 );
 
 const eventTone = [
-  "border-l-primary bg-primary/10",
-  "border-l-info bg-info/10",
-  "border-l-warning bg-warning/10",
-  "border-l-success bg-success/10",
-  "border-l-accent bg-accent/10",
-  "border-l-destructive bg-destructive/10",
+  "border-l-primary bg-orange-50 dark:bg-orange-950",
+  "border-l-info bg-sky-50 dark:bg-sky-950",
+  "border-l-warning bg-amber-50 dark:bg-amber-950",
+  "border-l-success bg-emerald-50 dark:bg-emerald-950",
+  "border-l-accent bg-yellow-50 dark:bg-yellow-950",
+  "border-l-destructive bg-rose-50 dark:bg-rose-950",
 ];
 
 export function ScheduleView() {
@@ -59,7 +59,7 @@ export function ScheduleView() {
                   return (
                     <article
                       key={`${appointment.time}-${appointment.patient}`}
-                      className={`absolute inset-x-2 z-10 overflow-hidden rounded-lg border border-border border-l-4 p-3 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md ${eventTone[index % eventTone.length]}`}
+                      className={`absolute inset-x-2 z-10 isolate overflow-hidden rounded-lg border border-border border-l-4 p-3 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md ${eventTone[index % eventTone.length]}`}
                       style={{ top, height }}
                     >
                       <div className="flex items-start justify-between gap-3">

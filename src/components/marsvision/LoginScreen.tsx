@@ -95,36 +95,51 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
       </section>
 
       <section
-        className="relative hidden min-h-screen overflow-hidden bg-[#B95F43] lg:block"
+        className="relative hidden min-h-screen overflow-hidden bg-slate-950 lg:block"
         aria-label="Paisagem marciana conceitual"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_18%,rgba(255,230,204,0.48),transparent_28%),linear-gradient(145deg,#8f3f2e_0%,#c87554_48%,#e3a178_100%)]" />
-        <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
-        <div className="absolute inset-x-0 bottom-0 h-[46%] bg-[linear-gradient(165deg,transparent_0_22%,rgba(112,51,36,0.32)_23%,rgba(91,42,31,0.62)_100%)]" />
+        <img
+          src="/images/mars-habitat-observation-window.png"
+          alt="Vista panorâmica de um cânion marciano através da janela técnica do habitat"
+          className="absolute inset-0 size-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,10,15,0.18),transparent_35%,rgba(4,10,15,0.48))]" />
 
-        <div className="absolute left-[13%] top-[12%] rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-medium text-white/85 backdrop-blur-md">
-          Setor de Operações · Marte
+        <div className="absolute left-[7%] top-[12%] border-l border-cyan-100/50 pl-4 font-mono text-[10px] uppercase leading-5 tracking-[0.16em] text-cyan-50/80 drop-shadow-md">
+          <p>ATM PRESSURE: 101.3 kPa</p>
+          <p>VISIBILITY: 42.8 km</p>
+        </div>
+        <div className="absolute right-[7%] top-[12%] border-r border-orange-100/50 pr-4 text-right font-mono text-[10px] uppercase leading-5 tracking-[0.16em] text-orange-50/85 drop-shadow-md">
+          <p>SOL 428-06:42 MTC</p>
+          <p>RADIATION LEVEL: High - Shielded</p>
         </div>
 
-        <div className="absolute bottom-[20%] left-1/2 h-[44%] w-[62%] -translate-x-1/2 rounded-t-[999px] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.38),rgba(255,255,255,0.06))] shadow-[inset_0_0_80px_rgba(255,255,255,0.16),0_35px_90px_rgba(67,30,23,0.25)] backdrop-blur-[2px]">
-          <div className="absolute inset-x-[12%] bottom-0 h-[22%] rounded-t-3xl border border-white/20 bg-[#6f392e]/55 backdrop-blur-md" />
-          <div className="absolute bottom-[22%] left-1/2 h-[52%] w-px bg-white/35" />
-          <div className="absolute bottom-[22%] left-[21%] h-[44%] w-px rotate-[28deg] bg-white/25" />
-          <div className="absolute bottom-[22%] right-[21%] h-[44%] w-px -rotate-[28deg] bg-white/25" />
-          <div className="absolute bottom-[28%] left-1/2 size-20 -translate-x-1/2 rounded-full border border-white/25 bg-[#FAF8F5]/90 shadow-[0_0_35px_rgba(255,239,218,0.55)]" />
-          <Eye className="absolute bottom-[calc(28%+1.75rem)] left-1/2 size-6 -translate-x-1/2 text-primary" />
+        <div className="absolute left-1/2 top-1/2 flex size-40 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cyan-50/35 shadow-[0_0_45px_rgba(207,250,254,0.08)] xl:size-48">
+          <span className="absolute inset-4 rounded-full border border-dashed border-cyan-50/20" />
+          <span className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-cyan-50/30 to-transparent" />
+          <span className="absolute left-0 top-1/2 h-px w-full bg-gradient-to-r from-transparent via-cyan-50/30 to-transparent" />
+          <div className="flex size-16 items-center justify-center rounded-full border border-cyan-50/40 bg-slate-950/15 text-cyan-50 backdrop-blur-[2px]">
+            <Eye className="size-7" strokeWidth={1.5} />
+          </div>
+          <span className="absolute -left-1 top-1/2 h-px w-4 bg-cyan-50/60" />
+          <span className="absolute -right-1 top-1/2 h-px w-4 bg-cyan-50/60" />
+          <span className="absolute left-1/2 -top-1 h-4 w-px bg-cyan-50/60" />
+          <span className="absolute bottom-[-0.25rem] left-1/2 h-4 w-px bg-cyan-50/60" />
         </div>
 
-        <div className="absolute bottom-10 left-10 right-10 flex items-end justify-between text-white xl:bottom-14 xl:left-14 xl:right-14">
-          <div className="max-w-md">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-              MarsVision
+        <div className="absolute bottom-[11%] left-[7%] right-[7%] flex items-end justify-between gap-8 border-t border-cyan-50/25 pt-5 text-white drop-shadow-lg">
+          <div className="max-w-lg">
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-50/65">
+              MV-OS · Observatório clínico
             </p>
-            <p className="mt-2 text-2xl font-semibold leading-tight">
-              Precisão clínica além da Terra.
+            <p className="mt-2 text-2xl font-semibold leading-tight xl:text-3xl">
+              Precisão clínica além da Terra
             </p>
           </div>
-          <p className="text-xs text-white/65">SOL 428 · 06:42 MTC</p>
+          <div className="hidden text-right font-mono text-[9px] uppercase leading-4 tracking-[0.14em] text-cyan-50/65 xl:block">
+            <p>Window integrity 100%</p>
+            <p>Habitat seal nominal</p>
+          </div>
         </div>
       </section>
     </main>
