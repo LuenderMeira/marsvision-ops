@@ -1,6 +1,17 @@
-import { MapPin, User } from "lucide-react";
+import { Clock3, MapPin, User } from "lucide-react";
 import { appointments } from "./data";
 import { StatusPill, apptTone } from "./StatusPill";
+
+const timeSlots = Array.from({ length: 11 }, (_, index) => `${String(index + 8).padStart(2, "0")}:00`);
+
+const eventTone = [
+  "border-l-primary bg-primary/10",
+  "border-l-info bg-info/10",
+  "border-l-warning bg-warning/10",
+  "border-l-success bg-success/10",
+  "border-l-accent bg-accent/10",
+  "border-l-destructive bg-destructive/10",
+];
 
 export function ScheduleView() {
   return (
@@ -13,32 +24,45 @@ export function ScheduleView() {
         <StatusPill tone="accent">Ocupação das salas: 68%</StatusPill>
       </div>
 
-      <ol className="p-4">
-        {appointments.map((a, i) => (
-          <li key={a.time} className="flex gap-4">
-            <div className="w-16 shrink-0 pt-3 text-right text-sm font-semibold text-foreground">{a.time}</div>
-            <div className="relative flex flex-col items-center">
-              <span className="mt-4 size-2 shrink-0 rounded-full bg-primary" />
-              {i < appointments.length - 1 && <span className="w-px flex-1 bg-border" />}
+      <div className="overflow-x-auto p-4 sm:p-5">
+        <div className="min-w-[680px]">
+          <div className="mb-3 grid grid-cols-[72px_1fr] gap-4">
+            <span className="label-tech text-right">Horário</span>
+            <span className="label-tech">Atendimentos do dia</span>
+          </div>
+          <div className="relative grid grid-cols-[72px_1fr] gap-x-4">
+            <div className="space-y-0">
+              {timeSlots.map((time) => <div key={time} className="h-20 pr-1 text-right text-xs font-semibold text-muted-foreground">{time}</div>)}
             </div>
-            <div className="mb-3 flex-1 rounded-lg border border-border bg-background p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-medium text-foreground">{a.title}</p>
-                <StatusPill tone={apptTone[a.status]}>{a.status}</StatusPill>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <User className="size-3.5" strokeWidth={1.8} /> {a.patient}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="size-3.5" strokeWidth={1.8} /> {a.room}
-                </span>
-                <span>{a.duration}</span>
+            <div className="relative">
+              {timeSlots.map((time) => <div key={time} className="h-20 border-t border-border last:border-b" />)}
+              <div className="absolute inset-0">
+                {appointments.map((appointment, index) => {
+                  const [hour = 8, minute = 0] = appointment.time.split(":").map(Number);
+                  const top = ((hour - 8) * 80) + (minute / 60) * 80;
+                  const height = Math.max(58, (Number.parseInt(appointment.duration, 10) / 60) * 80);
+                  return (
+                    <article key={`${appointment.time}-${appointment.patient}`} className={`absolute inset-x-2 overflow-hidden rounded-lg border border-border border-l-4 p-3 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md ${eventTone[index % eventTone.length]}`} style={{ top, height }}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-foreground">{appointment.patient}</p>
+                          <p className="truncate text-xs text-muted-foreground">{appointment.title}</p>
+                        </div>
+                        <StatusPill tone={apptTone[appointment.status]}>{appointment.status}</StatusPill>
+                      </div>
+                      <div className="mt-2 flex items-center gap-4 text-[11px] text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock3 className="size-3" /> {appointment.time} • {appointment.duration}</span>
+                        <span className="flex items-center gap-1"><MapPin className="size-3" /> {appointment.room}</span>
+                        <span className="flex items-center gap-1"><User className="size-3" /> Paciente</span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </div>
-          </li>
-        ))}
-      </ol>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
