@@ -12,6 +12,7 @@ import { SettingsView } from "@/components/marsvision/SettingsView";
 import { BillingView } from "@/components/marsvision/BillingView";
 import { LoginScreen } from "@/components/marsvision/LoginScreen";
 import { AIChatWidget } from "@/components/marsvision/AIChatWidget";
+import { AIConfigView } from "@/components/marsvision/AIConfigView";
 
 const title = "MarsVision | Gestão Oftalmológica em Marte";
 const description =
@@ -24,6 +25,7 @@ const pageTitles = {
   staff: { title: "Equipe", subtitle: "Acompanhe profissionais e escalas" },
   products: { title: "Produtos", subtitle: "Gerencie catálogo, preços e estoque" },
   billing: { title: "Faturamento", subtitle: "Acompanhe seu plano e as cobranças da clínica" },
+  "central-ai": { title: "Central da IA", subtitle: "Configure o assistente e o comportamento da IA" },
   settings: { title: "Configurações", subtitle: "Personalize a operação da clínica" },
 } as const;
 
@@ -90,6 +92,9 @@ function Index() {
             </TabsContent>
             <TabsContent value="billing">
               <BillingView />
+            </TabsContent>
+            <TabsContent value="central-ai">
+              <AIConfigView />
             </TabsContent>
             <TabsContent value="settings">
               <SettingsView />
