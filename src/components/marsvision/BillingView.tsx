@@ -6,7 +6,7 @@ export function BillingView() {
   return (
     <div className="mx-auto max-w-3xl">
       <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <div className="border-b border-border bg-gradient-to-br from-[#fff1ea] to-[#fffaf6] p-6 sm:p-8">
+        <div className="border-b border-border bg-gradient-to-br from-[#fff1ea] via-[#fff8f5] to-[#fffaf6] dark:from-[#2a1d1a] dark:via-[#201b1a] dark:to-[#171412] p-6 sm:p-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -20,7 +20,7 @@ export function BillingView() {
             <StatusPill tone="success">Ativo</StatusPill>
           </div>
 
-          <div className="mt-7 rounded-2xl border border-primary/20 bg-white/80 p-5 shadow-sm ring-1 ring-primary/5">
+          <div className="mt-7 rounded-2xl border border-primary/20 bg-white/80 p-5 shadow-sm ring-1 ring-primary/5 dark:bg-[#1e1a19]/90 dark:ring-primary/10">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Plano mensal</p>
@@ -56,7 +56,7 @@ export function BillingView() {
             </Button>
           </div>
 
-          <div className="rounded-2xl border border-border bg-[#fff9f6] p-4">
+          <div className="rounded-2xl border border-border bg-[#fff9f6] p-4 dark:bg-[#201b1a]">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex size-12 items-center justify-center rounded-xl bg-[#1a1f71] text-sm font-bold text-white shadow-sm">

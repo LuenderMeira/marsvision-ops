@@ -5,6 +5,7 @@ import {
   Stethoscope,
   Package,
   Settings,
+  Sparkles,
   Eye,
   CreditCard,
   Moon,
@@ -21,6 +22,7 @@ export const navItems = [
   { id: "patients", label: "Pacientes", icon: Users },
   { id: "staff", label: "Equipe", icon: Stethoscope },
   { id: "products", label: "Produtos", icon: Package },
+  { id: "central-ai", label: "Central da IA", icon: Sparkles },
   { id: "settings", label: "Configurações", icon: Settings },
 ] as const;
 
