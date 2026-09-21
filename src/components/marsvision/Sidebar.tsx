@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   LayoutGrid,
   CalendarDays,
@@ -22,13 +23,14 @@ export const navItems = [
   { id: "patients", label: "Pacientes", icon: Users },
   { id: "staff", label: "Equipe", icon: Stethoscope },
   { id: "products", label: "Produtos", icon: Package },
-  { id: "users", label: "Utilizadores", icon: Users },
   { id: "central-ai", label: "Central da IA", icon: Sparkles },
   { id: "settings", label: "Configurações", icon: Settings },
 ] as const;
 
+const usersItem = { id: "users", label: "Utilizadores", icon: Users } as const;
 const billingItem = { id: "billing", label: "Faturamento", icon: CreditCard } as const;
-const mobileNavItems = [...navItems, billingItem];
+const footerNavItems = [usersItem, billingItem] as const;
+const mobileNavItems = [...navItems, ...footerNavItems];
 
 export function Sidebar({
   value,
@@ -41,10 +43,21 @@ export function Sidebar({
   user: { nome: string; cargo?: string } | null;
   onLogout: () => void;
 }) {
+  const [loggedUser, setLoggedUser] = useState<{ nome?: string; cargo?: string }>({});
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "escuro";
-  const initials = user?.nome
-    ? user.nome
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}") as {
+      nome?: string;
+      cargo?: string;
+    };
+    setLoggedUser(storedUser);
+  }, []);
+
+  const currentUser = user ?? loggedUser;
+  const initials = currentUser?.nome
+    ? currentUser.nome
         .split(" ")
         .map((part) => part[0])
         .slice(0, 2)
@@ -87,20 +100,27 @@ export function Sidebar({
           })}
         </nav>
         <div className="px-4 pb-3">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => onChange(billingItem.id)}
-            className={cn(
-              "h-11 w-full justify-start gap-3 rounded-lg px-3 text-sm shadow-none",
-              value === billingItem.id
-                ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground hover:bg-sidebar-accent"
-                : "text-muted-foreground hover:bg-muted hover:text-sidebar-foreground",
-            )}
-          >
-            <billingItem.icon className="size-4" strokeWidth={2} />
-            {billingItem.label}
-          </Button>
+          {footerNavItems.map((item) => {
+            const active = value === item.id;
+            const Icon = item.icon;
+            return (
+              <Button
+                key={item.id}
+                type="button"
+                variant="ghost"
+                onClick={() => onChange(item.id)}
+                className={cn(
+                  "h-11 w-full justify-start gap-3 rounded-lg px-3 text-sm shadow-none",
+                  active
+                    ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground hover:bg-sidebar-accent"
+                    : "text-muted-foreground hover:bg-muted hover:text-sidebar-foreground",
+                )}
+              >
+                <Icon className="size-4" strokeWidth={2} />
+                {item.label}
+              </Button>
+            );
+          })}
         </div>
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3 px-1">
@@ -108,8 +128,10 @@ export function Sidebar({
               {initials}
             </div>
             <div className="min-w-0 flex-1 leading-tight">
-              <div className="truncate text-sm font-medium text-sidebar-foreground">{user?.nome || "Usuário"}</div>
-              <div className="truncate text-xs text-muted-foreground">{user?.cargo || "Acesso"}</div>
+              <div className="truncate text-sm font-medium text-sidebar-foreground">
+                {currentUser?.nome || "Usuário"}
+              </div>
+              <div className="truncate text-xs text-muted-foreground">{currentUser?.cargo || "Acesso"}</div>
             </div>
             <div className="flex items-center gap-1">
               <Tooltip>

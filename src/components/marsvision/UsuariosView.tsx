@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -40,6 +40,7 @@ type Usuario = {
 export function UsuariosView() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<Usuario | null>(null);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     nome: "",
@@ -47,6 +48,11 @@ export function UsuariosView() {
     senha: "",
     cargo: "Recepcionista",
   });
+
+  const resetForm = () => {
+    setFormData({ nome: "", email: "", senha: "", cargo: "Recepcionista" });
+    setError("");
+  };
 
   const fetchUsuarios = async () => {
     try {
@@ -66,10 +72,27 @@ export function UsuariosView() {
     fetchUsuarios();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/usuarios/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao excluir usuário");
+      }
+
+      setUsuarios((prev) => prev.filter((usuario) => usuario.id !== id));
+    } catch (error) {
+      console.error("Falha ao excluir usuário:", error);
+      setError("Não foi possível excluir o usuário.");
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (usuarios.length >= 3) {
+    if (!editingUser && usuarios.length >= 3) {
       setError("Seu plano permite até 3 usuários.");
       return;
     }
@@ -77,8 +100,14 @@ export function UsuariosView() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/api/usuarios", {
-        method: "POST",
+      const endpoint = editingUser
+        ? `http://localhost:8000/api/usuarios/${editingUser.id}`
+        : "http://localhost:8000/api/usuarios";
+
+      const method = editingUser ? "PUT" : "POST";
+
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -91,16 +120,50 @@ export function UsuariosView() {
       });
 
       if (!response.ok) {
-        throw new Error("Erro ao cadastrar usuário");
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload?.detail || "Erro ao salvar usuário");
+      }
+
+      if (editingUser) {
+        const updatedUser = {
+          ...editingUser,
+          nome: formData.nome,
+          email: formData.email,
+          cargo: formData.cargo,
+        };
+
+        setUsuarios((prev) => prev.map((usuario) => (usuario.id === editingUser.id ? updatedUser : usuario)));
+      } else {
+        await fetchUsuarios();
       }
 
       setIsModalOpen(false);
-      setFormData({ nome: "", email: "", senha: "", cargo: "Recepcionista" });
-      await fetchUsuarios();
+      setEditingUser(null);
+      resetForm();
     } catch (error) {
-      console.error("Falha ao cadastrar usuário:", error);
-      setError("Não foi possível cadastrar o usuário.");
+      console.error("Falha ao salvar usuário:", error);
+      setError(
+        editingUser ? "Não foi possível atualizar o usuário." : "Não foi possível cadastrar o usuário.",
+      );
     }
+  };
+
+  const openCreateModal = () => {
+    setEditingUser(null);
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (usuario: Usuario) => {
+    setEditingUser(usuario);
+    setFormData({
+      nome: usuario.nome,
+      email: usuario.email,
+      senha: "",
+      cargo: usuario.cargo,
+    });
+    setError("");
+    setIsModalOpen(true);
   };
 
   return (
@@ -111,17 +174,29 @@ export function UsuariosView() {
           <p className="label-tech mt-1">Controle de acesso e permissões da clínica</p>
         </div>
 
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <Dialog
+          open={isModalOpen}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+
+            if (!open) {
+              setEditingUser(null);
+              resetForm();
+            }
+          }}
+        >
           <DialogTrigger asChild>
-            <Button className="h-9 rounded-lg" type="button" disabled={usuarios.length >= 3}>
+            <Button className="h-9 rounded-lg" type="button" onClick={openCreateModal} disabled={usuarios.length >= 3}>
               <Plus className="size-4" strokeWidth={2} /> Novo Usuário
             </Button>
           </DialogTrigger>
 
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Novo usuário</DialogTitle>
-              <DialogDescription>Cadastre um novo usuário com acesso ao sistema.</DialogDescription>
+              <DialogTitle>{editingUser ? "Editar usuário" : "Novo usuário"}</DialogTitle>
+              <DialogDescription>
+                {editingUser ? "Atualize os dados do usuário selecionado." : "Cadastre um novo usuário com acesso ao sistema."}
+              </DialogDescription>
             </DialogHeader>
 
             {error && (
@@ -161,8 +236,8 @@ export function UsuariosView() {
                   type="password"
                   value={formData.senha}
                   onChange={(event) => setFormData((prev) => ({ ...prev, senha: event.target.value }))}
-                  placeholder="Digite a senha"
-                  required
+                  placeholder={editingUser ? "Deixe em branco para manter a senha atual" : "Digite a senha"}
+                  required={!editingUser}
                 />
               </div>
 
@@ -183,11 +258,19 @@ export function UsuariosView() {
               </div>
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingUser(null);
+                    resetForm();
+                  }}
+                >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={usuarios.length >= 3}>
-                  Salvar usuário
+                <Button type="submit" disabled={!editingUser && usuarios.length >= 3}>
+                  {editingUser ? "Salvar alterações" : "Salvar usuário"}
                 </Button>
               </DialogFooter>
             </form>
@@ -203,6 +286,7 @@ export function UsuariosView() {
               <TableHead>Email</TableHead>
               <TableHead>Cargo</TableHead>
               <TableHead className="text-right">Status</TableHead>
+              <TableHead className="w-28 text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -217,6 +301,30 @@ export function UsuariosView() {
                   ) : (
                     <StatusPill tone="success">Ativo</StatusPill>
                   )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      aria-label={`Editar ${usuario.nome}`}
+                      onClick={() => openEditModal(usuario)}
+                    >
+                      <Pencil className="size-4" strokeWidth={2} />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      aria-label={`Excluir ${usuario.nome}`}
+                      onClick={() => handleDelete(usuario.id)}
+                    >
+                      <Trash2 className="size-4" strokeWidth={2} />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
