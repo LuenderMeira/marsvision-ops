@@ -22,16 +22,35 @@ export const navItems = [
   { id: "patients", label: "Pacientes", icon: Users },
   { id: "staff", label: "Equipe", icon: Stethoscope },
   { id: "products", label: "Produtos", icon: Package },
+  { id: "users", label: "Utilizadores", icon: Users },
   { id: "central-ai", label: "Central da IA", icon: Sparkles },
   { id: "settings", label: "Configurações", icon: Settings },
 ] as const;
 
 const billingItem = { id: "billing", label: "Faturamento", icon: CreditCard } as const;
-const mobileNavItems = [...navItems.slice(0, -1), billingItem, navItems.at(-1)!];
+const mobileNavItems = [...navItems, billingItem];
 
-export function Sidebar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function Sidebar({
+  value,
+  onChange,
+  user,
+  onLogout,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  user: { nome: string; cargo?: string } | null;
+  onLogout: () => void;
+}) {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "escuro";
+  const initials = user?.nome
+    ? user.nome
+        .split(" ")
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "US";
   return (
     <TooltipProvider>
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar md:flex">
@@ -86,27 +105,44 @@ export function Sidebar({ value, onChange }: { value: string; onChange: (v: stri
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3 px-1">
             <div className="flex size-10 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-primary">
-              AS
+              {initials}
             </div>
             <div className="min-w-0 flex-1 leading-tight">
-              <div className="truncate text-sm font-medium text-sidebar-foreground">Dra. Silva</div>
-              <div className="truncate text-xs text-muted-foreground">Diretora clínica</div>
+              <div className="truncate text-sm font-medium text-sidebar-foreground">{user?.nome || "Usuário"}</div>
+              <div className="truncate text-xs text-muted-foreground">{user?.cargo || "Acesso"}</div>
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleTheme}
-                  aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
-                  className="shrink-0 text-muted-foreground hover:text-sidebar-foreground"
-                >
-                  {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">{isDark ? "Tema claro" : "Tema escuro"}</TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleTheme}
+                    aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
+                    className="shrink-0 text-muted-foreground hover:text-sidebar-foreground"
+                  >
+                    {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">{isDark ? "Tema claro" : "Tema escuro"}</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={onLogout}
+                    aria-label="Deslogar"
+                    className="shrink-0 text-muted-foreground hover:text-sidebar-foreground"
+                  >
+                    <span className="text-xs font-semibold">S</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Sair</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </aside>
@@ -144,6 +180,16 @@ export function Sidebar({ value, onChange }: { value: string; onChange: (v: stri
         >
           {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
           <span>Tema</span>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onLogout}
+          aria-label="Deslogar"
+          className="h-14 min-w-14 flex-col gap-1 rounded-lg px-1 text-[10px] text-muted-foreground shadow-none"
+        >
+          <span className="text-sm font-semibold">S</span>
+          <span>Sair</span>
         </Button>
       </nav>
     </TooltipProvider>

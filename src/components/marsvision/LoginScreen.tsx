@@ -1,12 +1,41 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Eye, Fingerprint, LockKeyhole, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function LoginScreen({ onLogin }: { onLogin: () => void }) {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onLogin();
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          senha,
+        }),
+      });
+
+      if (!response.ok) {
+        setError("Email ou senha incorretos");
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem("user", JSON.stringify(data.usuario));
+      onLogin();
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      setError("Email ou senha incorretos");
+    }
   }
 
   return (
@@ -45,9 +74,12 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <Input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 placeholder="nome@marsvision.com"
                 autoComplete="email"
-                className="h-12 rounded-lg border-border bg-white px-4 shadow-sm focus-visible:ring-2"
+                className="h-12 rounded-lg border-border bg-white px-4 text-foreground shadow-sm focus-visible:ring-2"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -63,13 +95,22 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 <Input
                   id="password"
                   type="password"
+                  value={senha}
+                  onChange={(event) => setSenha(event.target.value)}
                   placeholder="Digite sua senha"
                   autoComplete="current-password"
-                  className="h-12 rounded-lg border-border bg-white px-4 pr-11 shadow-sm focus-visible:ring-2"
+                  className="h-12 rounded-lg border-border bg-white px-4 pr-11 text-foreground shadow-sm focus-visible:ring-2"
+                  required
                 />
                 <LockKeyhole className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
+
+            {error && (
+              <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {error}
+              </p>
+            )}
 
             <div className="space-y-3 pt-2">
               <Button type="submit" className="h-12 w-full rounded-lg font-semibold shadow-sm">

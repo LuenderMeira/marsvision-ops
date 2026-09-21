@@ -54,9 +54,12 @@ export function ProductsView() {
     const nome = formData.nome;
     const categoria = formData.categoria;
     const quantidade = Number(formData.quantidade);
-    const preco = Number(formData.preco);
+    
+    // Tratamento ninja: garante que vírgulas virem pontos para o Python não surtar
+    const precoTratado = String(formData.preco).replace(',', '.');
+    const preco = Number(precoTratado);
 
-    console.log("Iniciando salvamento...", { nome, categoria, quantidade, preco });
+    console.log("Enviando para o backend:", { nome, categoria, quantidade, preco });
 
     try {
       const response = await fetch("http://localhost:8000/api/produtos", {
@@ -73,16 +76,21 @@ export function ProductsView() {
       });
 
       if (!response.ok) {
+        // Captura o erro exato do FastAPI para podermos ler
         const erro = await response.json();
-        console.error(erro);
-        throw new Error("Erro ao cadastrar produto");
+        console.error("O backend recusou:", erro);
+        alert("Ops! O servidor recusou os dados. Aperte F12 e veja a aba Console."); 
+        return; // Retorna para parar a execução (não fecha o modal)
       }
 
-      setIsModalOpen(false);
-      setFormData({ nome: "", categoria: "", quantidade: "", preco: "" });
-      await fetchProdutos();
+      // Se deu tudo 100% certo:
+      setIsModalOpen(false); // Fecha o modal
+      setFormData({ nome: "", categoria: "", quantidade: "", preco: "" }); // Limpa o form
+      await fetchProdutos(); // Atualiza a tabela com o item novo
+      
     } catch (error) {
-      console.error("Falha ao cadastrar produto:", error);
+      console.error("Erro de rede:", error);
+      alert("Falha na comunicação com o servidor local. O Uvicorn está rodando?");
     }
   };
 
