@@ -1,16 +1,35 @@
+import { useEffect, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { patients } from "./data";
 import { StatusPill, speciesTone } from "./StatusPill";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function PatientsView() {
+  const [pacientes, setPacientes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPacientes = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/pacientes");
+        if (!response.ok) {
+          throw new Error("Erro ao buscar pacientes");
+        }
+        const data = await response.json();
+        setPacientes(data);
+      } catch (error) {
+        console.error("Falha ao carregar pacientes:", error);
+      }
+    };
+
+    fetchPacientes();
+  }, []);
+
   return (
     <div className="panel">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
         <div>
           <h3 className="text-base font-semibold">Cadastro de pacientes</h3>
-          <p className="label-tech mt-1">1.284 registros • 8 exibidos</p>
+          <p className="label-tech mt-1">{pacientes.length} registros</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -35,19 +54,19 @@ export function PatientsView() {
             </tr>
           </thead>
           <tbody>
-            {patients.map((p) => (
+            {pacientes.map((p) => (
               <tr key={p.id} className="border-b border-border last:border-0 hover:bg-surface-2">
                 <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{p.id}</td>
-                <td className="px-4 py-3 font-medium text-foreground">{p.name}</td>
-                <td className="px-4 py-3 text-muted-foreground">{p.colony}</td>
+                <td className="px-4 py-3 font-medium text-foreground">{p.nome}</td>
+                <td className="px-4 py-3 text-muted-foreground">{p.setor}</td>
                 <td className="px-4 py-3">
-                  <StatusPill tone={speciesTone[p.species]}>{p.species}</StatusPill>
+                  <StatusPill tone={speciesTone[p.especie] ?? "default"}>{p.especie}</StatusPill>
                 </td>
-                <td className="px-4 py-3 text-xs font-medium text-foreground">{p.nextExam}</td>
+                <td className="px-4 py-3 text-xs font-medium text-foreground">{p.proximo_exame}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
-                    <Button type="button" variant="ghost" size="icon" aria-label={`Editar ${p.name}`} title={`Editar ${p.name}`} className="size-8 text-muted-foreground hover:text-foreground"><Pencil className="size-4" /></Button>
-                    <Button type="button" variant="ghost" size="icon" aria-label={`Excluir ${p.name}`} title={`Excluir ${p.name}`} className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-4" /></Button>
+                    <Button type="button" variant="ghost" size="icon" aria-label={`Editar ${p.nome}`} title={`Editar ${p.nome}`} className="size-8 text-muted-foreground hover:text-foreground"><Pencil className="size-4" /></Button>
+                    <Button type="button" variant="ghost" size="icon" aria-label={`Excluir ${p.nome}`} title={`Excluir ${p.nome}`} className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-4" /></Button>
                   </div>
                 </td>
               </tr>
