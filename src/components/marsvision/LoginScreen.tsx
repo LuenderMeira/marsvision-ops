@@ -106,27 +106,9 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,10,15,0.18),transparent_35%,rgba(4,10,15,0.48))]" />
 
         <div className="absolute left-[7%] top-[12%] border-l border-cyan-100/50 pl-4 font-mono text-[10px] uppercase leading-5 tracking-[0.16em] text-cyan-50/80 drop-shadow-md">
-          <p>ATM PRESSURE: 101.3 kPa</p>
-          <p>VISIBILITY: 42.8 km</p>
         </div>
         <div className="absolute right-[7%] top-[12%] border-r border-orange-100/50 pr-4 text-right font-mono text-[10px] uppercase leading-5 tracking-[0.16em] text-orange-50/85 drop-shadow-md">
-          <p>SOL 428-06:42 MTC</p>
-          <p>RADIATION LEVEL: High - Shielded</p>
         </div>
-
-        <div className="absolute left-1/2 top-1/2 flex size-40 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-cyan-50/35 shadow-[0_0_45px_rgba(207,250,254,0.08)] xl:size-48">
-          <span className="absolute inset-4 rounded-full border border-dashed border-cyan-50/20" />
-          <span className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-cyan-50/30 to-transparent" />
-          <span className="absolute left-0 top-1/2 h-px w-full bg-gradient-to-r from-transparent via-cyan-50/30 to-transparent" />
-          <div className="flex size-16 items-center justify-center rounded-full border border-cyan-50/40 bg-slate-950/15 text-cyan-50 backdrop-blur-[2px]">
-            <Eye className="size-7" strokeWidth={1.5} />
-          </div>
-          <span className="absolute -left-1 top-1/2 h-px w-4 bg-cyan-50/60" />
-          <span className="absolute -right-1 top-1/2 h-px w-4 bg-cyan-50/60" />
-          <span className="absolute left-1/2 -top-1 h-4 w-px bg-cyan-50/60" />
-          <span className="absolute bottom-[-0.25rem] left-1/2 h-4 w-px bg-cyan-50/60" />
-        </div>
-
         <div className="absolute bottom-[11%] left-[7%] right-[7%] flex items-end justify-between gap-8 border-t border-cyan-50/25 pt-5 text-white drop-shadow-lg">
           <div className="max-w-lg">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-50/65">
@@ -137,8 +119,6 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </p>
           </div>
           <div className="hidden text-right font-mono text-[9px] uppercase leading-4 tracking-[0.14em] text-cyan-50/65 xl:block">
-            <p>Window integrity 100%</p>
-            <p>Habitat seal nominal</p>
           </div>
         </div>
       </section>
