@@ -4,13 +4,55 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+type Mensagem = {
+  papel: "user" | "ia";
+  texto: string;
+};
+
 export function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [mensagens, setMensagens] = useState<Mensagem[]>([
+    { papel: "ia", texto: "Olá! Como posso ajudar hoje na clínica?" },
+  ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage("");
+
+    const mensagemUsuario = input.trim();
+    if (!mensagemUsuario || isLoading) {
+      return;
+    }
+
+    setMensagens((prev) => [...prev, { papel: "user", texto: mensagemUsuario }]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ mensagem: mensagemUsuario }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Falha ao obter resposta da IA");
+      }
+
+      const data = await response.json();
+      setMensagens((prev) => [...prev, { papel: "ia", texto: data.resposta }]);
+    } catch (error) {
+      console.error("Erro ao consultar IA:", error);
+      setMensagens((prev) => [
+        ...prev,
+        { papel: "ia", texto: "Não consegui responder agora. Tente novamente em instantes." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -52,24 +94,33 @@ export function AIChatWidget() {
           </Button>
         </header>
 
-        <div className="flex-1 space-y-5 overflow-y-auto bg-white px-4 py-5 dark:bg-slate-950">
+        <div className="flex-1 space-y-4 overflow-y-auto bg-white px-4 py-5 dark:bg-slate-950">
           <p className="text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground dark:text-slate-400">
             Hoje · Assistência operacional
           </p>
-          <div className="flex justify-end">
-            <div className="max-w-[82%] rounded-2xl rounded-br-md bg-muted px-4 py-3 text-sm leading-5 text-foreground dark:bg-slate-800 dark:text-slate-100">
-              Preciso de um check-up de radiação para sexta-feira.
+
+          {mensagens.map((mensagem, index) => (
+            <div key={`${mensagem.papel}-${index}`} className={cn("flex", mensagem.papel === "user" ? "justify-end" : "justify-start")}>
+              <div
+                className={cn(
+                  "max-w-[84%] rounded-2xl px-4 py-3 text-sm leading-5 whitespace-pre-wrap",
+                  mensagem.papel === "user"
+                    ? "bg-primary text-white rounded-br-md"
+                    : "bg-surface-2 text-foreground rounded-bl-md dark:bg-slate-800 dark:text-slate-100",
+                )}
+              >
+                {mensagem.texto}
+              </div>
             </div>
-          </div>
-          <div className="flex items-end gap-2.5">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <Bot className="size-3.5" />
+          ))}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="rounded-2xl rounded-bl-md bg-surface-2 px-4 py-3 text-xs font-medium text-muted-foreground dark:bg-slate-800 dark:text-slate-300">
+                Pensando...
+              </div>
             </div>
-            <div className="max-w-[84%] rounded-2xl rounded-bl-md bg-[#FFF1EA] px-4 py-3 text-sm leading-5 text-foreground dark:bg-orange-950/50 dark:text-orange-50">
-              Verificando disponibilidade da equipe... Encontrei uma janela às 10h30 com a Dra.
-              Silva. Posso confirmar e gerar o pré-cadastro do paciente na Agenda?
-            </div>
-          </div>
+          )}
         </div>
 
         <form
@@ -78,10 +129,11 @@ export function AIChatWidget() {
         >
           <div className="flex items-center gap-2 rounded-xl border border-border bg-[#FAF8F5] p-1.5 pl-3 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 dark:bg-slate-900">
             <Input
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              placeholder="Digite seu comando..."
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder={isLoading ? "A IA está respondendo..." : "Digite seu comando..."}
               aria-label="Digite seu comando"
+              disabled={isLoading}
               className="h-9 flex-1 border-0 bg-transparent px-0 text-foreground shadow-none focus-visible:ring-0 dark:text-slate-100 dark:placeholder:text-slate-400"
             />
             <Button
@@ -89,6 +141,7 @@ export function AIChatWidget() {
               size="icon"
               className="size-9 rounded-lg"
               aria-label="Enviar comando"
+              disabled={isLoading || !input.trim()}
             >
               <Send className="size-4" />
             </Button>

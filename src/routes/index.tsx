@@ -50,6 +50,11 @@ function Index() {
   const [user, setUser] = useState<{ id: number; nome: string; cargo: string } | null>(null);
   const [view, setView] = useState<string>("dashboard");
   const page = pageTitles[view as keyof typeof pageTitles] ?? pageTitles.dashboard;
+  const hojeLabel = new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -92,7 +97,7 @@ function Index() {
           </div>
           <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-muted-foreground shadow-sm">
             <CalendarDays className="size-4 text-primary" />
-            <span>16 de setembro de 2026</span>
+            <span>{hojeLabel}</span>
           </div>
         </header>
         <main className="px-5 pb-8 pt-5 sm:px-8 lg:px-10">

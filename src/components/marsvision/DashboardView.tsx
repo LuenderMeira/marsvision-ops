@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { AlertTriangle, Activity, Eye, Package, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { chartData } from "./data";
@@ -37,6 +38,38 @@ function Metric({
 }
 
 export function DashboardView() {
+  const [stats, setStats] = useState({
+    pacientes: 0,
+    agendamentos: 0,
+    produtos: 0,
+    alertas_estoque: 0,
+  });
+
+  useEffect(() => {
+    const carregarDashboard = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/dashboard");
+
+        if (!response.ok) {
+          throw new Error("Não foi possível carregar o dashboard.");
+        }
+
+        const dados = await response.json();
+
+        setStats({
+          pacientes: Number(dados.pacientes ?? 0),
+          agendamentos: Number(dados.agendamentos ?? 0),
+          produtos: Number(dados.produtos ?? 0),
+          alertas_estoque: Number(dados.alertas_estoque ?? 0),
+        });
+      } catch (error) {
+        console.error("Erro ao carregar os dados do dashboard:", error);
+      }
+    };
+
+    carregarDashboard();
+  }, []);
+
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/10 p-4">
@@ -50,10 +83,10 @@ export function DashboardView() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric label="Consultas Hoje" value="42" sub="6 a mais que no sol anterior" icon={Activity} />
-        <Metric label="Óculos Anti-Areia Vendidos" value="128" sub="Unidades neste ciclo" icon={Eye} />
-        <Metric label="Nível de Radiação" value="3,2 mSv" sub="Alto — transporte protegido recomendado" icon={AlertTriangle} warning />
-        <Metric label="Pacientes Ativos" value="+12%" sub="1.284 cadastrados neste ciclo" icon={TrendingUp} />
+        <Metric label="Agendamentos" value={String(stats.agendamentos)} sub="Registros no sistema atual" icon={Activity} />
+        <Metric label="Produtos Cadastrados" value={String(stats.produtos)} sub="Itens no inventário" icon={Eye} />
+        <Metric label="Alertas de Estoque" value={String(stats.alertas_estoque)} sub="Itens abaixo de 5 unidades" icon={AlertTriangle} warning />
+        <Metric label="Pacientes Cadastrados" value={String(stats.pacientes)} sub="Total ativo no banco" icon={TrendingUp} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

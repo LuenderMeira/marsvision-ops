@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrainCircuit, Eye, EyeOff, HelpCircle, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,19 +10,68 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 
 export function AIConfigView() {
-  const [agentEnabled, setAgentEnabled] = useState(true);
+  const [ativa, setAtiva] = useState(true);
   const [showApiKey, setShowApiKey] = useState(false);
-  const [apiKey, setApiKey] = useState("gsk_1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7");
-  const [assistantName, setAssistantName] = useState("Luna");
-  const [voiceTone, setVoiceTone] = useState("Acolhedor");
+  const [apiKey, setApiKey] = useState("");
+  const [nomeAssistente, setNomeAssistente] = useState("Luna");
+  const [tomVoz, setTomVoz] = useState("Acolhedor");
   const [scopes, setScopes] = useState({
     faqs: true,
     agenda: true,
     preCadastro: true,
   });
 
+  useEffect(() => {
+    const carregarConfiguracao = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/config-ia");
+
+        if (!response.ok) {
+          throw new Error("Não foi possível carregar a configuração da IA.");
+        }
+
+        const dados = await response.json();
+
+        setAtiva(Boolean(dados.ativa));
+        setApiKey(dados.api_key ?? "");
+        setNomeAssistente(dados.nome_assistente ?? "Luna");
+        setTomVoz(dados.tom_voz ?? "Acolhedor");
+      } catch (error) {
+        console.error("Erro ao carregar a configuração da IA:", error);
+      }
+    };
+
+    carregarConfiguracao();
+  }, []);
+
   const toggleScope = (key: keyof typeof scopes) => {
     setScopes((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSalvarAlteracoes = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/config-ia", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ativa,
+          api_key: apiKey,
+          nome_assistente: nomeAssistente,
+          tom_voz: tomVoz,
+        }),
+      });
+
+      if (!response.ok) {
+        const erro = await response.json().catch(() => ({}));
+        throw new Error(erro.detail || "Não foi possível salvar a configuração da IA.");
+      }
+
+      alert("Configuração da IA salva com sucesso!");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Erro ao salvar a configuração da IA.");
+    }
   };
 
   return (
@@ -58,10 +107,10 @@ export function AIConfigView() {
               <div>
                 <p className="text-sm font-semibold text-foreground">Ativar assistente</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {agentEnabled ? "O agente está disponível para atendimento." : "O agente está temporariamente inativo."}
+                  {ativa ? "O agente está disponível para atendimento." : "O agente está temporariamente inativo."}
                 </p>
               </div>
-              <Switch checked={agentEnabled} onCheckedChange={setAgentEnabled} aria-label="Ativar assistente" />
+              <Switch checked={ativa} onCheckedChange={setAtiva} aria-label="Ativar assistente" />
             </div>
           </CardContent>
         </Card>
@@ -141,8 +190,8 @@ export function AIConfigView() {
             </Label>
             <Input
               id="assistant-name"
-              value={assistantName}
-              onChange={(event) => setAssistantName(event.target.value)}
+              value={nomeAssistente}
+              onChange={(event) => setNomeAssistente(event.target.value)}
               placeholder="Ex: Luna"
               className="rounded-lg border-border bg-surface text-foreground"
             />
@@ -150,7 +199,7 @@ export function AIConfigView() {
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Tom de Voz</Label>
-            <Select value={voiceTone} onValueChange={setVoiceTone}>
+            <Select value={tomVoz} onValueChange={setTomVoz}>
               <SelectTrigger className="w-full rounded-lg border-border bg-surface text-foreground">
                 <SelectValue placeholder="Selecione o tom" />
               </SelectTrigger>
@@ -195,7 +244,13 @@ export function AIConfigView() {
           </div>
 
           <div className="flex justify-end">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Salvar alterações</Button>
+            <Button
+              type="button"
+              onClick={handleSalvarAlteracoes}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Salvar alterações
+            </Button>
           </div>
         </CardContent>
       </Card>
