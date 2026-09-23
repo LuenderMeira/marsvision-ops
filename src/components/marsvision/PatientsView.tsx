@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import HologramaOlho from './HologramaOlho';
+import HologramaOlho, { type Lesao } from './HologramaOlho';
 
 export function PatientsView() {
   const [pacientes, setPacientes] = useState<any[]>([]);
@@ -20,6 +20,21 @@ export function PatientsView() {
   });
 
   const pacienteSelecionado = pacientes.find((paciente) => paciente.id === selectedPacienteId) ?? pacientes[0] ?? null;
+
+  const lesoesRick: Lesao[] = [
+    { id: 1, position: [1.8, 1.2, 1.2], info: "Abrasão de Córnea - Poeira Marciana Nível 2" },
+    { id: 2, position: [-1.2, 0.5, 2.1], info: "Dano Retinal - Radiação (3.5 mSv)" },
+  ];
+
+  const lesoesLuender: Lesao[] = [
+    { id: 1, position: [0, 0, 2.5], info: "Fadiga Ocular Frontal - Excesso de telas (Desenvolvimento)" },
+  ];
+
+  const lesoesAtuais = pacienteSelecionado?.nome === "Rick Sanches"
+    ? lesoesRick
+    : pacienteSelecionado?.nome === "Luender Novais Meira"
+      ? lesoesLuender
+      : [];
 
   const openCreateModal = () => {
     setEditingPaciente(null);
@@ -164,7 +179,7 @@ export function PatientsView() {
         </div>
 
         <div className="flex min-h-[360px] w-full items-stretch">
-          <HologramaOlho />
+          <HologramaOlho lesoes={lesoesAtuais} />
         </div>
       </div>
 
