@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import HologramaOlho from './HologramaOlho';
 
 export function PatientsView() {
   const [pacientes, setPacientes] = useState<any[]>([]);
+  const [selectedPacienteId, setSelectedPacienteId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPaciente, setEditingPaciente] = useState<any | null>(null);
   const [formData, setFormData] = useState({
@@ -16,6 +18,8 @@ export function PatientsView() {
     setor: "",
     proximo_exame: "",
   });
+
+  const pacienteSelecionado = pacientes.find((paciente) => paciente.id === selectedPacienteId) ?? pacientes[0] ?? null;
 
   const openCreateModal = () => {
     setEditingPaciente(null);
@@ -55,6 +59,17 @@ export function PatientsView() {
   useEffect(() => {
     fetchPacientes();
   }, []);
+
+  useEffect(() => {
+    if (!pacientes.length) {
+      setSelectedPacienteId(null);
+      return;
+    }
+
+    if (!selectedPacienteId || !pacientes.some((paciente) => paciente.id === selectedPacienteId)) {
+      setSelectedPacienteId(pacientes[0].id);
+    }
+  }, [pacientes, selectedPacienteId]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -102,7 +117,9 @@ export function PatientsView() {
         throw new Error("Erro ao deletar paciente");
       }
 
-      setPacientes((prev) => prev.filter((paciente) => paciente.id !== id));
+      const pacientesAtualizados = pacientes.filter((paciente) => paciente.id !== id);
+      setPacientes(pacientesAtualizados);
+      setSelectedPacienteId((prevSelected) => (prevSelected === id ? pacientesAtualizados[0]?.id ?? null : prevSelected));
     } catch (error) {
       console.error("Falha ao deletar paciente:", error);
     }
@@ -110,6 +127,47 @@ export function PatientsView() {
 
   return (
     <div className="panel">
+      <div className="grid grid-cols-1 gap-8 p-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-border/80 bg-[#090d17]/90 p-5 shadow-lg shadow-black/20">
+          {pacienteSelecionado ? (
+            <>
+              <div className="mb-6 flex items-start justify-between gap-4 border-b border-border/80 pb-4">
+                <div>
+                  <p className="label-tech">Paciente em foco</p>
+                  <h3 className="mt-2 text-2xl font-semibold text-foreground">{pacienteSelecionado.nome}</h3>
+                </div>
+                <StatusPill tone={speciesTone[pacienteSelecionado.especie] ?? "default"}>{pacienteSelecionado.especie}</StatusPill>
+              </div>
+
+              <div className="space-y-4 text-sm text-muted-foreground">
+                <div className="rounded-xl border border-border bg-surface-2/80 p-3">
+                  <p className="label-tech">ID do paciente</p>
+                  <p className="mt-1 text-base font-medium text-foreground">#{pacienteSelecionado.id}</p>
+                </div>
+
+                <div className="rounded-xl border border-border bg-surface-2/80 p-3">
+                  <p className="label-tech">Colônia / Setor</p>
+                  <p className="mt-1 text-base font-medium text-foreground">{pacienteSelecionado.setor}</p>
+                </div>
+
+                <div className="rounded-xl border border-border bg-surface-2/80 p-3">
+                  <p className="label-tech">Próximo exame</p>
+                  <p className="mt-1 text-base font-medium text-foreground">{pacienteSelecionado.proximo_exame}</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex h-full min-h-[260px] items-center justify-center text-muted-foreground">
+              Nenhum paciente selecionado.
+            </div>
+          )}
+        </div>
+
+        <div className="flex min-h-[360px] w-full items-stretch">
+          <HologramaOlho />
+        </div>
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
         <div>
           <h3 className="text-base font-semibold">Cadastro de pacientes</h3>
@@ -204,7 +262,11 @@ export function PatientsView() {
           </thead>
           <tbody>
             {pacientes.map((p) => (
-              <tr key={p.id} className="border-b border-border last:border-0 hover:bg-surface-2">
+              <tr
+                key={p.id}
+                className={`cursor-pointer border-b border-border last:border-0 hover:bg-surface-2 ${selectedPacienteId === p.id ? "bg-surface-2/80" : ""}`}
+                onClick={() => setSelectedPacienteId(p.id)}
+              >
                 <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{p.id}</td>
                 <td className="px-4 py-3 font-medium text-foreground">{p.nome}</td>
                 <td className="px-4 py-3 text-muted-foreground">{p.setor}</td>
@@ -221,7 +283,10 @@ export function PatientsView() {
                       aria-label={`Editar ${p.nome}`}
                       title={`Editar ${p.nome}`}
                       className="size-8 text-muted-foreground hover:text-foreground"
-                      onClick={() => openEditModal(p)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openEditModal(p);
+                      }}
                     >
                       <Pencil className="size-4" />
                     </Button>
@@ -232,7 +297,10 @@ export function PatientsView() {
                       aria-label={`Excluir ${p.nome}`}
                       title={`Excluir ${p.nome}`}
                       className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => handleDelete(p.id)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDelete(p.id);
+                      }}
                     >
                       <Trash2 className="size-4" />
                     </Button>

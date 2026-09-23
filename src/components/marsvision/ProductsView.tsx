@@ -25,12 +25,30 @@ type Produto = {
 export function ProductsView() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduto, setEditingProduto] = useState<Produto | null>(null);
   const [formData, setFormData] = useState({
     nome: "",
     categoria: "",
     quantidade: "",
     preco: "",
   });
+
+  const openCreateModal = () => {
+    setEditingProduto(null);
+    setFormData({ nome: "", categoria: "", quantidade: "", preco: "" });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (produto: Produto) => {
+    setEditingProduto(produto);
+    setFormData({
+      nome: produto.nome,
+      categoria: produto.categoria,
+      quantidade: String(produto.quantidade),
+      preco: String(produto.preco),
+    });
+    setIsModalOpen(true);
+  };
 
   const fetchProdutos = async () => {
     try {
@@ -54,16 +72,17 @@ export function ProductsView() {
     const nome = formData.nome;
     const categoria = formData.categoria;
     const quantidade = Number(formData.quantidade);
-    
-    // Tratamento ninja: garante que vírgulas virem pontos para o Python não surtar
-    const precoTratado = String(formData.preco).replace(',', '.');
+    const precoTratado = String(formData.preco).replace(",", ".");
     const preco = Number(precoTratado);
 
-    console.log("Enviando para o backend:", { nome, categoria, quantidade, preco });
-
     try {
-      const response = await fetch("http://localhost:8000/api/produtos", {
-        method: "POST",
+      const url = editingProduto
+        ? `http://localhost:8000/api/produtos/${editingProduto.id}`
+        : "http://localhost:8000/api/produtos";
+      const method = editingProduto ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -76,21 +95,36 @@ export function ProductsView() {
       });
 
       if (!response.ok) {
-        // Captura o erro exato do FastAPI para podermos ler
-        const erro = await response.json();
+        const erro = await response.json().catch(() => null);
         console.error("O backend recusou:", erro);
-        alert("Ops! O servidor recusou os dados. Aperte F12 e veja a aba Console."); 
-        return; // Retorna para parar a execução (não fecha o modal)
+        alert("Ops! O servidor recusou os dados do produto.");
+        return;
       }
 
-      // Se deu tudo 100% certo:
-      setIsModalOpen(false); // Fecha o modal
-      setFormData({ nome: "", categoria: "", quantidade: "", preco: "" }); // Limpa o form
-      await fetchProdutos(); // Atualiza a tabela com o item novo
-      
+      setIsModalOpen(false);
+      setEditingProduto(null);
+      setFormData({ nome: "", categoria: "", quantidade: "", preco: "" });
+      await fetchProdutos();
     } catch (error) {
       console.error("Erro de rede:", error);
       alert("Falha na comunicação com o servidor local. O Uvicorn está rodando?");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/produtos/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao excluir produto");
+      }
+
+      setProdutos((prev) => prev.filter((produto) => produto.id !== id));
+    } catch (error) {
+      console.error("Falha ao excluir produto:", error);
+      alert("Não foi possível excluir o produto.");
     }
   };
 
@@ -104,15 +138,17 @@ export function ProductsView() {
 
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
-            <Button className="h-9 rounded-lg" type="button">
+            <Button className="h-9 rounded-lg" type="button" onClick={openCreateModal}>
               <Plus className="size-4" strokeWidth={2} /> Adicionar produto
             </Button>
           </DialogTrigger>
 
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Cadastrar produto</DialogTitle>
-              <DialogDescription>Preencha os dados do novo produto para adicionar ao estoque.</DialogDescription>
+              <DialogTitle>{editingProduto ? "Editar produto" : "Cadastrar produto"}</DialogTitle>
+              <DialogDescription>
+                {editingProduto ? "Atualize os dados do produto selecionado." : "Preencha os dados do novo produto para adicionar ao estoque."}
+              </DialogDescription>
             </DialogHeader>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -169,7 +205,7 @@ export function ProductsView() {
                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit">Salvar produto</Button>
+                <Button type="submit">{editingProduto ? "Salvar alterações" : "Salvar produto"}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -208,10 +244,26 @@ export function ProductsView() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
-                      <Button type="button" variant="ghost" size="icon" aria-label={`Editar ${produto.nome}`} title={`Editar ${produto.nome}`} className="size-8 text-muted-foreground hover:text-foreground">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Editar ${produto.nome}`}
+                        title={`Editar ${produto.nome}`}
+                        className="size-8 text-muted-foreground hover:text-foreground"
+                        onClick={() => openEditModal(produto)}
+                      >
                         <Pencil className="size-4" />
                       </Button>
-                      <Button type="button" variant="ghost" size="icon" aria-label={`Excluir ${produto.nome}`} title={`Excluir ${produto.nome}`} className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Excluir ${produto.nome}`}
+                        title={`Excluir ${produto.nome}`}
+                        className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleDelete(produto.id)}
+                      >
                         <Trash2 className="size-4" />
                       </Button>
                     </div>

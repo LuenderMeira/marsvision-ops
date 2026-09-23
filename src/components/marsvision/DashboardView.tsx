@@ -44,6 +44,11 @@ export function DashboardView() {
     produtos: 0,
     alertas_estoque: 0,
   });
+  const [telemetria, setTelemetria] = useState({
+    temperatura: -64,
+    radiacao: 2.5,
+    pressao: 101.3,
+  });
 
   useEffect(() => {
     const carregarDashboard = async () => {
@@ -68,6 +73,18 @@ export function DashboardView() {
     };
 
     carregarDashboard();
+  }, []);
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setTelemetria((prev) => ({
+        ...prev,
+        temperatura: Number((Math.random() * ( -62 - -65 ) + -65).toFixed(1)),
+        radiacao: Number((Math.random() * (3.8 - 2.1) + 2.1).toFixed(1)),
+      }));
+    }, 3000);
+
+    return () => clearInterval(intervalo);
   }, []);
 
   return (
@@ -136,9 +153,9 @@ export function DashboardView() {
             <p className="label-tech mt-1">Monitoramento do Setor 4</p>
           </div>
           {[
-            { k: "Pressão da cúpula", v: "101,3 kPa", tone: "success" as const },
-            { k: "Poeira suspensa", v: "874 µg/m³", tone: "warning" as const },
-            { k: "Temperatura externa", v: "-61 °C", tone: "info" as const },
+            { k: "Pressão da cúpula", v: `${telemetria.pressao.toFixed(1)} kPa`, tone: "success" as const },
+            { k: "Poeira suspensa", v: `${telemetria.radiacao.toFixed(1)} µSv/h`, tone: "warning" as const },
+            { k: "Temperatura externa", v: `${telemetria.temperatura.toFixed(1)} °C`, tone: "info" as const },
             { k: "Transporte de suprimentos", v: "Chegada em 4h 12min", tone: "neutral" as const },
             { k: "Produtos com estoque baixo", v: "3 itens", tone: "danger" as const },
           ].map((r) => (
